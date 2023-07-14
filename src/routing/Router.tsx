@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import { ROUTES } from './routes.const';
-import { EmployeeList } from '../employee-list';
+import { EmployeeList } from '../employee';
 
 export const ROUTER = createBrowserRouter([
   {

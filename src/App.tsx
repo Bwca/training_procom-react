@@ -3,7 +3,7 @@ import React from 'react';
 import { RouterProvider } from 'react-router-dom';
 
 import './App.css';
-import { ROUTER } from './routing/Router';
+import { ROUTER } from './routing';
 
 export function App() {
   return (
