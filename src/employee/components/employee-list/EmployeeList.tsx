@@ -19,7 +19,7 @@ export const EmployeeList: FC = () => {
     (id: number) => () => {
       navigate(generatePath(ROUTES.EMPLOYEE_VIEW, { id: id.toString() }));
     },
-    [navigate, generatePath],
+    [navigate],
   );
 
   return (
