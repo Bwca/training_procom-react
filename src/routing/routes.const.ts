@@ -1,5 +1,4 @@
 export const ROUTES = {
-  EMPLOYEE_LIST: 'employee-list',
+  EMPLOYEE_LIST: '/employee-list',
+  EMPLOYEE_VIEW: '/employee-view/:id?',
 } as const;
-
-type RoutePath = (typeof ROUTES)[keyof typeof ROUTES];

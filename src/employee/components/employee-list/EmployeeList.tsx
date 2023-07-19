@@ -1,26 +1,29 @@
-import { FC, useEffect } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { generatePath, useNavigate } from 'react-router-dom';
 
 import { useEmployeeApi } from '../../hooks';
+import { ROUTES } from '../../../routing';
 
 export const EmployeeList: FC = () => {
   const { employeeList, getEmployeeList } = useEmployeeApi();
 
   useEffect(() => {
     void getEmployeeList();
-  }, []);
+  }, [getEmployeeList]);
+
+  const navigate = useNavigate();
+
+  const goToPage = useCallback(
+    (id: number) => () => {
+      navigate(generatePath(ROUTES.EMPLOYEE_VIEW, { id: id.toString() }));
+    },
+    [navigate, generatePath],
+  );
 
   return (
-    <Container maxWidth="lg">
+    <>
       <Typography
         variant="h3"
         component="h3"
@@ -44,7 +47,7 @@ export const EmployeeList: FC = () => {
           </TableHead>
           <TableBody>
             {employeeList.map((employee) => (
-              <TableRow key={employee.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              <TableRow key={employee.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }} onClick={goToPage(employee.id!)}>
                 <TableCell component="th" scope="row">
                   {employee.id}
                 </TableCell>
@@ -66,6 +69,6 @@ export const EmployeeList: FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </Container>
+    </>
   );
 };

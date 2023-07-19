@@ -2,7 +2,7 @@ export const getRequestErrorHandleDecorator = ({ setErrorMessage }: { setErrorMe
   return <F extends FunctionWithArguments>(func: F) => {
     return async (...args: Parameters<F>): Promise<void> => {
       try {
-        await func(args);
+        await func(...args);
         setErrorMessage(null);
       } catch (e) {
         console.error(e);

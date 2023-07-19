@@ -29,7 +29,7 @@ export class Employee<SecurityDataType = unknown> {
    * @secure
    */
   employeeList = (params: RequestParams = {}) =>
-    this.http.request<Array<EmployeeDto>, any>({
+    this.http.request<EmployeeDto[], any>({
       path: `/Employee`,
       method: 'GET',
       secure: true,

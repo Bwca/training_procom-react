@@ -1,1 +1,1 @@
-export { EmployeeList } from './components';
+export { EmployeeList, EmployeeForm } from './components';
