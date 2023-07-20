@@ -66,7 +66,7 @@ export const EmployeeFormElement: FC<EmployeeFormElementProps> = ({
 
       <ButtonGroup variant="outlined" sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button type="submit" variant="contained" color="primary">
-          Create Employee
+          Save Employee
         </Button>
       </ButtonGroup>
     </form>

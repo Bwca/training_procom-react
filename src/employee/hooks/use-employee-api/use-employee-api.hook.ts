@@ -33,13 +33,28 @@ export const useEmployeeApi = () => {
     [requestHandleDecorator],
   );
 
+  const deleteEmployee = useCallback(
+    requestHandleDecorator((id: number) => EMPLOYEE_API.employeeDelete(id)),
+    [requestHandleDecorator],
+  );
+
+  const updateEmployee = useCallback(
+    requestHandleDecorator(async (id: number, employee: EmployeeDto) => {
+      const response = await EMPLOYEE_API.employeeUpdate(id, employee);
+      setEmployee(response.data);
+    }),
+    [requestHandleDecorator],
+  );
+
   return {
     createEmployee,
+    deleteEmployee,
     employee,
     employeeList,
     errorMessage,
     getEmployeeById,
     getEmployeeList,
     isInProgress,
+    updateEmployee,
   };
 };

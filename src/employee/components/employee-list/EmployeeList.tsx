@@ -1,10 +1,10 @@
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 
 import { CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import { generatePath, useNavigate } from 'react-router-dom';
 
 import { useEmployeeApi } from '../../hooks';
-import { ROUTES } from '../../../routing';
+import { DeleteEmployeeButton } from '../delete-employee-button';
+import { EditEmployeeButton } from '../edit-employee-button';
 
 export const EmployeeList: FC = () => {
   const { employeeList, getEmployeeList, isInProgress } = useEmployeeApi();
@@ -12,15 +12,6 @@ export const EmployeeList: FC = () => {
   useEffect(() => {
     void getEmployeeList();
   }, [getEmployeeList]);
-
-  const navigate = useNavigate();
-
-  const goToPage = useCallback(
-    (id: number) => () => {
-      navigate(generatePath(ROUTES.EMPLOYEE_VIEW, { id: id.toString() }));
-    },
-    [navigate],
-  );
 
   return (
     <>
@@ -46,11 +37,12 @@ export const EmployeeList: FC = () => {
                 <TableCell>Email</TableCell>
                 <TableCell>Phone Number</TableCell>
                 <TableCell>Addresses</TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {employeeList.map((employee) => (
-                <TableRow key={employee.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }} onClick={goToPage(employee.id!)}>
+                <TableRow key={employee.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell component="th" scope="row">
                     {employee.id}
                   </TableCell>
@@ -66,6 +58,10 @@ export const EmployeeList: FC = () => {
                           .join(', ')}
                       </p>
                     ))}
+                  </TableCell>
+                  <TableCell>
+                    <EditEmployeeButton id={employee.id!} />
+                    <DeleteEmployeeButton id={employee.id!} onDelete={getEmployeeList} />
                   </TableCell>
                 </TableRow>
               ))}

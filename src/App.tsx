@@ -12,7 +12,7 @@ export function App() {
     <>
       <Navigation />
       <Container maxWidth="lg">
-        <Box mt={12}>
+        <Box mt={14} mb={6}>
           <RouterProvider router={ROUTER} />
         </Box>
       </Container>

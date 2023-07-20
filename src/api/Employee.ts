@@ -79,7 +79,7 @@ export class Employee<SecurityDataType = unknown> {
    * @secure
    */
   employeeUpdate = (id: number, data: EmployeeDto, params: RequestParams = {}) =>
-    this.http.request<void, EmployeeUpdateError>({
+    this.http.request<EmployeeDto, EmployeeUpdateError>({
       path: `/Employee/${id}`,
       method: 'PUT',
       body: data,
