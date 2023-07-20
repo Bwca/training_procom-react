@@ -5,6 +5,7 @@ import { useGetRequestErrorHandleDecorator } from '../use-get-request-handle-dec
 
 export const useEmployeeApi = () => {
   const [employeeList, setEmployeeList] = useState<Array<EmployeeDto>>([]);
+  const [employee, setEmployee] = useState<EmployeeDto | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { requestHandleDecorator, isInProgress } = useGetRequestErrorHandleDecorator(setErrorMessage);
@@ -24,11 +25,21 @@ export const useEmployeeApi = () => {
     [requestHandleDecorator],
   );
 
+  const getEmployeeById = useCallback(
+    requestHandleDecorator(async (id: number) => {
+      const response = await EMPLOYEE_API.employeeDetail(id);
+      setEmployee(response.data);
+    }),
+    [requestHandleDecorator],
+  );
+
   return {
-    employeeList,
-    getEmployeeList,
     createEmployee,
+    employee,
+    employeeList,
     errorMessage,
+    getEmployeeById,
+    getEmployeeList,
     isInProgress,
   };
 };

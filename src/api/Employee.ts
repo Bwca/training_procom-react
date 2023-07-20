@@ -63,7 +63,7 @@ export class Employee<SecurityDataType = unknown> {
    * @secure
    */
   employeeDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<void, EmployeeDetailError>({
+    this.http.request<EmployeeDto, EmployeeDetailError>({
       path: `/Employee/${id}`,
       method: 'GET',
       secure: true,

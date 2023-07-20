@@ -7,8 +7,20 @@ import { EmployeeFormProps } from '../../models';
 import { EmployeeDto } from '../../../../../api';
 import { EmployeeFormElement } from '../employee-form-element';
 
-export const EmployeeHookForm: FC<EmployeeFormProps> = ({ dto, onSubmit }) => {
-  const { register, control, handleSubmit } = useForm({});
+export const EmployeeHookForm: FC<EmployeeFormProps> = ({ employee, onSubmit }) => {
+  const { register, control, handleSubmit } = useForm<EmployeeDto>({
+    defaultValues: !employee
+      ? {}
+      : {
+          id: employee.id,
+          email: employee.email,
+          lastName: employee.lastName,
+          firstName: employee.firstName,
+          phoneNumber: employee.phoneNumber,
+          addresses: employee.addresses,
+        },
+  });
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'addresses',
@@ -21,7 +33,7 @@ export const EmployeeHookForm: FC<EmployeeFormProps> = ({ dto, onSubmit }) => {
     if (!fields.length) {
       addAddressRow();
     }
-    // has to fire only once
+    // has to fire only once, no dependencies requirements here
   }, []);
 
   const handleFormSubmit = handleSubmit((data: Partial<EmployeeDto>) => {
@@ -31,9 +43,12 @@ export const EmployeeHookForm: FC<EmployeeFormProps> = ({ dto, onSubmit }) => {
     });
   });
 
-  const registerFormField = useCallback((fieldName: string): TextFieldProps => {
-    return register(fieldName);
-  }, [register]);
+  const registerFormField = useCallback(
+    (fieldName: string): TextFieldProps => {
+      return register(fieldName as keyof EmployeeDto);
+    },
+    [register],
+  );
 
   return (
     <>

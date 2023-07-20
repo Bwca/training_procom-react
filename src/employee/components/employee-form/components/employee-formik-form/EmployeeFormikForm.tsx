@@ -7,14 +7,16 @@ import { EmployeeFormProps } from '../../models';
 import { EmployeeDto } from '../../../../../api';
 import { EmployeeFormElement } from '../employee-form-element';
 
-export const EmployeeFormikForm: FC<EmployeeFormProps> = ({ onSubmit }) => {
-  const initialValues: Partial<EmployeeDto> = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
-    addresses: [],
-  };
+export const EmployeeFormikForm: FC<EmployeeFormProps> = ({ employee, onSubmit }) => {
+  const initialValues: Partial<EmployeeDto> = employee
+    ? employee
+    : {
+        firstName: '',
+        lastName: '',
+        email: '',
+        phoneNumber: '',
+        addresses: [],
+      };
 
   const formik = useFormik({
     initialValues,
@@ -31,7 +33,7 @@ export const EmployeeFormikForm: FC<EmployeeFormProps> = ({ onSubmit }) => {
     },
   });
 
-  const { values, handleSubmit, handleChange, handleBlur, setFieldValue } = formik;
+  const { values, handleSubmit, handleChange, handleBlur, setFieldValue, getFieldProps } = formik;
   const { addresses } = values;
 
   const addAddressRow = useCallback(() => {
@@ -55,12 +57,12 @@ export const EmployeeFormikForm: FC<EmployeeFormProps> = ({ onSubmit }) => {
     (fieldName: string): TextFieldProps => {
       return {
         name: fieldName,
-        value: values[fieldName as keyof EmployeeDto],
+        value: getFieldProps(fieldName).value,
         onChange: handleChange,
         onBlur: handleBlur,
       };
     },
-    [handleChange, handleBlur, values],
+    [handleChange, handleBlur, values, getFieldProps],
   );
 
   return (

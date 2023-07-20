@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback, useEffect, useMemo } from 'react';
 
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { CircularProgress, Typography } from '@mui/material';
@@ -9,13 +9,22 @@ import { EmployeeDto } from '../../../api';
 import { ROUTES } from '../../../routing';
 
 export const EmployeeForm: FC = () => {
-  const { createEmployee, isInProgress } = useEmployeeApi();
+  const { createEmployee, isInProgress, employee, getEmployeeById } = useEmployeeApi();
   const params = useParams();
   const navigate = useNavigate();
 
   const mode = useMemo(() => {
     return !!params.id ? 'edit' : 'create';
   }, [params.id]);
+
+  useEffect(
+    function fetchEmployee() {
+      if (params.id) {
+        getEmployeeById(+params.id);
+      }
+    },
+    [params.id],
+  );
 
   const onFormSubmit = useCallback(
     async (data: Partial<EmployeeDto>) => {
@@ -24,6 +33,8 @@ export const EmployeeForm: FC = () => {
     },
     [navigate, createEmployee],
   );
+
+  const canShowEmployeeForm = useMemo(() => (params.id && employee) || !params.id, [employee, params.id]);
 
   return (
     <>
@@ -36,7 +47,7 @@ export const EmployeeForm: FC = () => {
       >
         {mode === 'edit' ? 'Edit Employee' : 'Create Employee'}
       </Typography>
-      {isInProgress ? <CircularProgress /> : <EmployeeFormComponent onSubmit={onFormSubmit} />}
+      {isInProgress ? <CircularProgress /> : canShowEmployeeForm && <EmployeeFormComponent onSubmit={onFormSubmit} employee={employee} />}
     </>
   );
 };

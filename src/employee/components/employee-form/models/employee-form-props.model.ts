@@ -1,6 +1,6 @@
 import { EmployeeDto } from '../../../../api';
 
 export interface EmployeeFormProps {
-  dto?: Partial<EmployeeDto>;
+  employee: Partial<EmployeeDto> | null;
   onSubmit: (dto: Partial<EmployeeDto>) => void;
 }
