@@ -1,7 +1,7 @@
 import { FC, useCallback, useMemo } from 'react';
 
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
-import { Typography } from '@mui/material';
+import { CircularProgress, Typography } from '@mui/material';
 
 import { EmployeeFormComponent } from './components';
 import { useEmployeeApi } from '../../hooks';
@@ -9,7 +9,7 @@ import { EmployeeDto } from '../../../api';
 import { ROUTES } from '../../../routing';
 
 export const EmployeeForm: FC = () => {
-  const { createEmployee } = useEmployeeApi();
+  const { createEmployee, isInProgress } = useEmployeeApi();
   const params = useParams();
   const navigate = useNavigate();
 
@@ -36,7 +36,7 @@ export const EmployeeForm: FC = () => {
       >
         {mode === 'edit' ? 'Edit Employee' : 'Create Employee'}
       </Typography>
-      <EmployeeFormComponent onSubmit={onFormSubmit} />
+      {isInProgress ? <CircularProgress /> : <EmployeeFormComponent onSubmit={onFormSubmit} />}
     </>
   );
 };

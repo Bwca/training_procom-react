@@ -17,10 +17,11 @@ export const EmployeeHookForm: FC<EmployeeFormProps> = ({ dto, onSubmit }) => {
   const addAddressRow = useCallback(() => append({}), [append]);
   const removeAddressRow = useCallback((i: number) => () => remove(i), [remove]);
 
-  useEffect(() => {
+  useEffect(function addEmptyAddressRowOnLoad() {
     if (!fields.length) {
       addAddressRow();
     }
+    // has to fire only once
   }, []);
 
   const handleFormSubmit = handleSubmit((data: Partial<EmployeeDto>) => {
@@ -32,7 +33,7 @@ export const EmployeeHookForm: FC<EmployeeFormProps> = ({ dto, onSubmit }) => {
 
   const registerFormField = useCallback((fieldName: string): TextFieldProps => {
     return register(fieldName);
-  }, []);
+  }, [register]);
 
   return (
     <>
