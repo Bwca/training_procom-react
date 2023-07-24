@@ -1,14 +1,24 @@
 import { FC, useCallback, useEffect } from 'react';
 
-import { useFieldArray, useForm } from 'react-hook-form';
+import { Resolver, useFieldArray, useForm, FieldError } from 'react-hook-form';
 import { TextFieldProps } from '@mui/material/TextField/TextField';
+import { yupResolver } from '@hookform/resolvers/yup';
 
-import { EmployeeFormProps } from '../../models';
+import { EmployeeFormProps, FormFieldName } from '../../models';
 import { EmployeeDto } from '../../../../../api';
 import { EmployeeFormElement } from '../employee-form-element';
+import { EMPLOYEE } from '../../schemas';
+import { extractErrorFromErrorObject } from '../../utils';
 
 export const EmployeeHookForm: FC<EmployeeFormProps> = ({ employee, onSubmit }) => {
-  const { register, control, handleSubmit } = useForm<EmployeeDto>({
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<EmployeeDto>({
+    resolver: yupResolver(EMPLOYEE) as Resolver<EmployeeDto>,
+    mode: 'onBlur',
     defaultValues: !employee
       ? {}
       : {
@@ -20,7 +30,6 @@ export const EmployeeHookForm: FC<EmployeeFormProps> = ({ employee, onSubmit }) 
           addresses: employee.addresses,
         },
   });
-
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'addresses',
@@ -44,10 +53,16 @@ export const EmployeeHookForm: FC<EmployeeFormProps> = ({ employee, onSubmit }) 
   });
 
   const registerFormField = useCallback(
-    (fieldName: string): TextFieldProps => {
-      return register(fieldName as keyof EmployeeDto);
+    (fieldName: FormFieldName): TextFieldProps => {
+      const error = extractErrorFromErrorObject(fieldName, errors);
+
+      return {
+        ...register(fieldName as keyof EmployeeDto),
+        helperText: error?.message,
+        error: !!error,
+      };
     },
-    [register],
+    [register, errors, extractErrorFromErrorObject],
   );
 
   return (

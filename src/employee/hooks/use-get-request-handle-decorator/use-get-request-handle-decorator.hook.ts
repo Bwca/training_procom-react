@@ -1,29 +1,53 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export const useGetRequestErrorHandleDecorator = (setErrorMessage: (e: string | null) => void) => {
+import { AxiosError } from 'axios';
+
+import { useNotification } from '../../../notification';
+
+export const useGetRequestErrorHandleDecorator = () => {
   const [isInProgress, setIsInProgress] = useState(false);
   const [requestCount, setRequestCount] = useState(0);
+  const { setNotification } = useNotification();
 
   useEffect(() => {
     setIsInProgress(requestCount > 0);
   }, [requestCount]);
 
   const requestHandleDecorator = useCallback(
-    <F extends FunctionWithArguments>(func: F) => {
+    <P = AxiosError<string>, F extends FunctionWithArguments = FunctionWithArguments>({
+      generateProblemMessage,
+      successMessage,
+      func,
+    }: RequestDecoratorPayload<P, F>) => {
       return async (...args: Parameters<F>): Promise<void> => {
         try {
           setRequestCount((prevCount) => prevCount + 1);
           await func(...args);
-          setErrorMessage(null);
+
+          if (successMessage) {
+            setNotification({
+              text: successMessage,
+              type: 'success',
+            });
+          }
         } catch (e) {
-          console.error(e);
-          setErrorMessage('An error has occurred!' + (e as any).toString());
+          if (generateProblemMessage) {
+            const error = e as P;
+            const problemMessage = generateProblemMessage(error);
+
+            setNotification({
+              text: problemMessage,
+              type: 'error',
+            });
+          } else {
+            console.error(e);
+          }
         } finally {
           setRequestCount((prevCount) => Math.max(prevCount - 1, 0));
         }
       };
     },
-    [setErrorMessage],
+    [setNotification],
   );
 
   return { requestHandleDecorator, isInProgress };
@@ -32,3 +56,11 @@ export const useGetRequestErrorHandleDecorator = (setErrorMessage: (e: string | 
 interface FunctionWithArguments {
   (...args: any): Promise<any>;
 }
+
+interface RequestDecoratorPayload<Error, F extends FunctionWithArguments> {
+  func: F;
+  generateProblemMessage?: ProblemMessageGenerator<Error>;
+  successMessage?: string;
+}
+
+type ProblemMessageGenerator<T> = (payload: T) => string;

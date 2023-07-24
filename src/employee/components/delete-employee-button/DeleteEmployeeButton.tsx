@@ -2,7 +2,7 @@ import { FC, useCallback } from 'react';
 
 import { Button } from '@mui/material';
 
-import { useEmployeeApi } from '../../hooks';
+import { useEmployeeApi, useConfirmationDialog } from '../../hooks';
 import { DeleteEmployeeButtonProps } from './models';
 
 export const DeleteEmployeeButton: FC<DeleteEmployeeButtonProps> = ({ id, onDelete }) => {
@@ -13,9 +13,20 @@ export const DeleteEmployeeButton: FC<DeleteEmployeeButtonProps> = ({ id, onDele
     onDelete();
   }, [deleteEmployee, onDelete, id]);
 
+  const { openDialog, ConfirmationDialog } = useConfirmationDialog({
+    onConfirm: handleDeleteEmployee,
+    cancellationText: 'Cancel',
+    confirmationText: 'Yes, delete the user',
+    modalTitle: 'Delete user',
+    modalBody: 'Are you sure you would like to delete the user? The action cannot be undone.',
+  });
+
   return (
-    <Button onClick={handleDeleteEmployee} type="button" color="warning">
-      delete
-    </Button>
+    <>
+      <Button onClick={openDialog} type="button" color="warning">
+        delete
+      </Button>
+      <ConfirmationDialog />
+    </>
   );
 };

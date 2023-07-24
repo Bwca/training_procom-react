@@ -3,9 +3,11 @@ import { FC, useCallback, useEffect } from 'react';
 import { useFormik } from 'formik';
 import { TextFieldProps } from '@mui/material/TextField/TextField';
 
-import { EmployeeFormProps } from '../../models';
+import { EmployeeFormProps, FormFieldName } from '../../models';
 import { EmployeeDto } from '../../../../../api';
 import { EmployeeFormElement } from '../employee-form-element';
+import { EMPLOYEE } from '../../schemas';
+import { extractErrorFromErrorObject } from '../../utils';
 
 export const EmployeeFormikForm: FC<EmployeeFormProps> = ({ employee, onSubmit }) => {
   const initialValues: Partial<EmployeeDto> = employee
@@ -19,6 +21,7 @@ export const EmployeeFormikForm: FC<EmployeeFormProps> = ({ employee, onSubmit }
       };
 
   const formik = useFormik({
+    validationSchema: EMPLOYEE,
     initialValues,
     onSubmit: (values) => {
       const updatedAddresses = values.addresses?.map((a: any) => ({
@@ -33,7 +36,7 @@ export const EmployeeFormikForm: FC<EmployeeFormProps> = ({ employee, onSubmit }
     },
   });
 
-  const { values, handleSubmit, handleChange, handleBlur, setFieldValue, getFieldProps } = formik;
+  const { values, handleSubmit, handleChange, handleBlur, setFieldValue, getFieldProps, errors, touched } = formik;
   const { addresses } = values;
 
   const addAddressRow = useCallback(() => {
@@ -54,15 +57,20 @@ export const EmployeeFormikForm: FC<EmployeeFormProps> = ({ employee, onSubmit }
   }, []);
 
   const registerFormField = useCallback(
-    (fieldName: string): TextFieldProps => {
+    (fieldName: FormFieldName): TextFieldProps => {
+      const error = extractErrorFromErrorObject(fieldName, errors);
+      const fieldProps = getFieldProps(fieldName);
+      const hasBeenTouched: boolean = fieldName.split('.').reduce((a: any, b: string) => a?.[b], touched);
       return {
         name: fieldName,
-        value: getFieldProps(fieldName).value,
+        value: fieldProps.value,
         onChange: handleChange,
         onBlur: handleBlur,
+        helperText: hasBeenTouched ? error : undefined,
+        error: hasBeenTouched && !!error,
       };
     },
-    [handleChange, handleBlur, values, getFieldProps],
+    [handleChange, handleBlur, values, getFieldProps, errors, extractErrorFromErrorObject, touched],
   );
 
   return (

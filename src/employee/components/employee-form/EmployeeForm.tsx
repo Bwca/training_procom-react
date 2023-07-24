@@ -10,9 +10,13 @@ import { ROUTES } from '../../../routing';
 import { DeleteEmployeeButton } from '../delete-employee-button';
 
 export const EmployeeForm: FC = () => {
-  const { createEmployee, isInProgress, employee, getEmployeeById, updateEmployee } = useEmployeeApi();
-  const params = useParams();
   const navigate = useNavigate();
+  const goToEmployeesList = useCallback(() => {
+    navigate(generatePath(ROUTES.EMPLOYEE_LIST));
+  }, [navigate]);
+
+  const { createEmployee, isInProgress, employee, getEmployeeById, updateEmployee } = useEmployeeApi(goToEmployeesList);
+  const params = useParams();
 
   const mode = useMemo(() => {
     return !!params.id ? 'edit' : 'create';
@@ -24,46 +28,45 @@ export const EmployeeForm: FC = () => {
         getEmployeeById(+params.id);
       }
     },
-    [params.id],
+    [params.id, getEmployeeById],
   );
 
-  const goToEmployeesList = useCallback(() => {
-    navigate(generatePath(ROUTES.EMPLOYEE_LIST));
-  }, [navigate]);
-
   const onFormSubmit = useCallback(
-    async (data: Partial<EmployeeDto>) => {
-      await (params.id ? updateEmployee(+params.id, data) : createEmployee(data));
-      goToEmployeesList();
+    (data: Partial<EmployeeDto>) => {
+      params.id ? updateEmployee(+params.id, data) : createEmployee(data);
     },
-    [goToEmployeesList, createEmployee, updateEmployee, params.id],
+    [createEmployee, updateEmployee, params.id],
   );
 
   const canShowEmployeeForm = useMemo(() => (params.id && employee) || !params.id, [employee, params.id]);
 
   return (
     <>
-      {isInProgress ? (
-        <CircularProgress />
-      ) : (
-        canShowEmployeeForm && (
-          <>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography
-                variant="h3"
-                component="h3"
-                sx={{
-                  margin: '40px 0',
-                }}
-              >
-                {mode === 'edit' ? 'Edit Employee' : 'Create Employee'}
-              </Typography>
-              {employee?.id && <DeleteEmployeeButton id={employee.id} onDelete={goToEmployeesList} />}
-            </Box>
+      {isInProgress && <CircularProgress />}
+      {canShowEmployeeForm && (
+        <>
+          <Box visibility={isInProgress ? 'hidden' : 'visible'} display="flex" justifyContent="space-between" alignItems="center">
+            <Typography
+              variant="h3"
+              component="h3"
+              sx={{
+                margin: '40px 0',
+              }}
+            >
+              {mode === 'edit' ? 'Edit Employee' : 'Create Employee'}
+            </Typography>
+            {employee?.id && <DeleteEmployeeButton id={employee.id} onDelete={goToEmployeesList} />}
+          </Box>
 
+          <div
+            style={{
+              pointerEvents: isInProgress ? 'none' : 'inherit',
+              opacity: isInProgress ? 0.5 : 1,
+            }}
+          >
             <EmployeeFormComponent onSubmit={onFormSubmit} employee={employee} />
-          </>
-        )
+          </div>
+        </>
       )}
     </>
   );
