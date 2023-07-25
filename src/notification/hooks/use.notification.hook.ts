@@ -1,12 +1,22 @@
-import { useContext } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { NotificationContext } from '../contexts';
+import { Subject } from 'rxjs';
 
-export const useNotification = () => {
-  const context = useContext(NotificationContext);
+import { Message, NotificationContext } from '../models';
 
-  if (context === undefined) {
-    throw new Error('useCount must be used within a NotificationProvider');
-  }
-  return context;
+const message$ = new Subject<Message | undefined>();
+
+export const useNotification = (): NotificationContext => {
+  const [message, setMessage] = useState<Message | undefined>();
+
+  useEffect(() => {
+    const subscription = message$.subscribe((m) => setMessage(m));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const setNotification = useCallback((message?: Message) => {
+    message$.next(message);
+  }, []);
+
+  return { notification: message, setNotification };
 };

@@ -2,7 +2,7 @@ import { FC, useCallback } from 'react';
 
 import { Alert } from '@mui/material';
 
-import { useNotification } from '../hooks';
+import { useNotification } from '../../hooks';
 
 export const Notification: FC = () => {
   const { notification, setNotification } = useNotification();

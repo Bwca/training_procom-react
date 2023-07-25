@@ -1,6 +1,6 @@
 import { Message } from './message.model';
 
-export interface NotificationContextModel {
+export interface NotificationContext {
   setNotification: (m?: Message) => void;
   notification?: Message;
 }
