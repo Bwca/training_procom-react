@@ -1,10 +1,12 @@
 import { FC, useEffect } from 'react';
 
-import { CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { CircularProgress, Typography } from '@mui/material';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 import { useEmployeeApi } from '../../hooks';
 import { DeleteEmployeeButton } from '../delete-employee-button';
 import { EditEmployeeButton } from '../edit-employee-button';
+import { addressValueGetter } from './utils';
 
 export const EmployeeList: FC = () => {
   const { employeeList, getEmployeeList, isInProgress } = useEmployeeApi();
@@ -13,61 +15,43 @@ export const EmployeeList: FC = () => {
     void getEmployeeList();
   }, [getEmployeeList]);
 
+  const columns: GridColDef[] = [
+    { field: 'id', headerName: 'Id', flex: 1 },
+    { field: 'firstName', headerName: 'First Name', flex: 1 },
+    { field: 'lastName', headerName: 'Last Name', flex: 1 },
+    { field: 'email', headerName: 'Email', flex: 1 },
+    { field: 'phoneNumber', headerName: 'Phone Number', flex: 1 },
+    {
+      field: 'addresses',
+      headerName: 'Addresses',
+      flex: 1,
+      valueGetter: addressValueGetter,
+    },
+
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      flex: 1,
+      renderCell: (params) => (
+        <>
+          <EditEmployeeButton id={params.id as number} />
+          <DeleteEmployeeButton id={params.id as number} onDelete={getEmployeeList} />
+        </>
+      ),
+    },
+  ];
+
   return (
     <>
-      <Typography
-        variant="h3"
-        component="h3"
-        sx={{
-          margin: '40px 0',
-        }}
-      >
+      <Typography variant="h3" component="h3" sx={{ margin: '40px 0' }}>
         Employee List
       </Typography>
       {isInProgress ? (
         <CircularProgress />
       ) : (
-        <TableContainer component={Paper} sx={{ maxWidth: 1200, margin: 'auto' }}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Id</TableCell>
-                <TableCell>First Name</TableCell>
-                <TableCell>Last Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Phone Number</TableCell>
-                <TableCell>Addresses</TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {employeeList.map((employee) => (
-                <TableRow key={employee.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                  <TableCell component="th" scope="row">
-                    {employee.id}
-                  </TableCell>
-                  <TableCell>{employee.firstName}</TableCell>
-                  <TableCell>{employee.lastName}</TableCell>
-                  <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.phoneNumber}</TableCell>
-                  <TableCell>
-                    {employee.addresses?.map((address, idx) => (
-                      <p key={idx}>
-                        {[address.apartmentNumber, address.streetName, address.state, address.country, address.postalCode]
-                          .filter(Boolean)
-                          .join(', ')}
-                      </p>
-                    ))}
-                  </TableCell>
-                  <TableCell>
-                    <EditEmployeeButton id={employee.id!} />
-                    <DeleteEmployeeButton id={employee.id!} onDelete={getEmployeeList} />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <div style={{ height: 400, width: '100%', marginBottom: '40px' }}>
+          <DataGrid rows={employeeList} columns={columns} />
+        </div>
       )}
     </>
   );

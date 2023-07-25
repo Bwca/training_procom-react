@@ -46,13 +46,7 @@ export const EmployeeForm: FC = () => {
       {canShowEmployeeForm && (
         <>
           <Box visibility={isInProgress ? 'hidden' : 'visible'} display="flex" justifyContent="space-between" alignItems="center">
-            <Typography
-              variant="h3"
-              component="h3"
-              sx={{
-                margin: '40px 0',
-              }}
-            >
+            <Typography variant="h3" component="h3">
               {mode === 'edit' ? 'Edit Employee' : 'Create Employee'}
             </Typography>
             {employee?.id && <DeleteEmployeeButton id={employee.id} onDelete={goToEmployeesList} />}

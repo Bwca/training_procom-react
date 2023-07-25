@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect } from 'react';
 
-import { Resolver, useFieldArray, useForm, FieldError } from 'react-hook-form';
+import { Resolver, useFieldArray, useForm } from 'react-hook-form';
 import { TextFieldProps } from '@mui/material/TextField/TextField';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -43,6 +43,7 @@ export const EmployeeHookForm: FC<EmployeeFormProps> = ({ employee, onSubmit }) 
       addAddressRow();
     }
     // has to fire only once, no dependencies requirements here
+    // eslint-disable-next-line
   }, []);
 
   const handleFormSubmit = handleSubmit((data: Partial<EmployeeDto>) => {
@@ -62,7 +63,7 @@ export const EmployeeHookForm: FC<EmployeeFormProps> = ({ employee, onSubmit }) 
         error: !!error,
       };
     },
-    [register, errors, extractErrorFromErrorObject],
+    [register, errors],
   );
 
   return (

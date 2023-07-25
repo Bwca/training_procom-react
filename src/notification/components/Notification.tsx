@@ -21,9 +21,8 @@ export const Notification: FC = () => {
             position: 'fixed',
             top: '100px',
             zIndex: 9999,
-            width: '80%',
-            left: '10%'
-
+            width: '60%',
+            left: '20%',
           }}
         >
           {notification.text}
