@@ -1,12 +1,14 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 
 import { EMPLOYEE_API, EmployeeDto } from '../../../api';
 import { useGetRequestErrorHandleDecorator } from '../use-get-request-handle-decorator';
 import { extractErrorMessage } from './utils';
+import { useEmployee } from '../use-employee';
+import { useEmployeeList } from '../use-employee-list';
 
 export const useEmployeeApi = (successCallback?: () => void) => {
-  const [employeeList, setEmployeeList] = useState<Array<EmployeeDto>>([]);
-  const [employee, setEmployee] = useState<EmployeeDto | null>(null);
+  const { setEmployee, employee } = useEmployee();
+  const { setEmployeeList, employeeList } = useEmployeeList();
 
   const { requestHandleDecorator, isInProgress } = useGetRequestErrorHandleDecorator();
 
@@ -47,7 +49,7 @@ export const useEmployeeApi = (successCallback?: () => void) => {
     requestHandleDecorator({
       func: (id: number) => EMPLOYEE_API.employeeDelete(id),
       successMessage: `Employee has been deleted!`,
-      generateProblemMessage: extractErrorMessage
+      generateProblemMessage: extractErrorMessage,
     }),
     [requestHandleDecorator, extractErrorMessage],
   );
