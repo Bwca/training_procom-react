@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
 
 import { useNotification } from '../../../notification';
+import { FunctionWithArguments, RequestDecoratorPayload } from './models';
 
 export const useGetRequestErrorHandleDecorator = () => {
   const [isInProgress, setIsInProgress] = useState(false);
@@ -52,15 +53,3 @@ export const useGetRequestErrorHandleDecorator = () => {
 
   return { requestHandleDecorator, isInProgress };
 };
-
-interface FunctionWithArguments {
-  (...args: any): Promise<any>;
-}
-
-interface RequestDecoratorPayload<Error, F extends FunctionWithArguments> {
-  func: F;
-  generateProblemMessage?: ProblemMessageGenerator<Error>;
-  successMessage?: string;
-}
-
-type ProblemMessageGenerator<T> = (payload: T) => string;
