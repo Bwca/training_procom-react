@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { EMPLOYEE_API, EmployeeDto } from '../../../api';
 import { useGetRequestErrorHandleDecorator } from '../use-get-request-handle-decorator';
@@ -12,11 +12,36 @@ export const useEmployeeApi = (successCallback?: () => void) => {
 
   const { requestHandleDecorator, isInProgress } = useGetRequestErrorHandleDecorator();
 
+  const requestControllers = useRef<Array<AbortController>>([]);
+
+  useEffect(() => {
+    return () => {
+      requestControllers.current.forEach((c) => c.abort());
+    };
+  }, []);
+
+  const { addAbortController, removeAbortController } = useMemo(() => {
+    const addAbortController = () => {
+      const controller = new AbortController();
+      requestControllers.current.push(controller);
+      return controller;
+    };
+    const removeAbortController = (controller: AbortController) => {
+      requestControllers.current = requestControllers.current.filter((c) => c !== controller);
+    };
+
+    return { addAbortController, removeAbortController };
+  }, []);
+
   const getEmployeeList = useCallback(
     requestHandleDecorator({
       func: async () => {
-        const response = await EMPLOYEE_API.employeeList();
+        const controller = addAbortController();
+        const response = await EMPLOYEE_API.employeeList({
+          signal: controller.signal,
+        });
         setEmployeeList(response.data);
+        removeAbortController(controller);
       },
     }),
     [requestHandleDecorator, successCallback],
@@ -25,8 +50,12 @@ export const useEmployeeApi = (successCallback?: () => void) => {
   const createEmployee = useCallback(
     requestHandleDecorator({
       func: async (employee: EmployeeDto) => {
-        await EMPLOYEE_API.employeeCreate(employee);
+        const controller = addAbortController();
+        await EMPLOYEE_API.employeeCreate(employee, {
+          signal: controller.signal,
+        });
         successCallback?.();
+        removeAbortController(controller);
       },
       successMessage: 'Employee created!',
       generateProblemMessage: extractErrorMessage,
@@ -37,8 +66,12 @@ export const useEmployeeApi = (successCallback?: () => void) => {
   const getEmployeeById = useCallback(
     requestHandleDecorator({
       func: async (id: number) => {
-        const response = await EMPLOYEE_API.employeeDetail(id);
+        const controller = addAbortController();
+        const response = await EMPLOYEE_API.employeeDetail(id, {
+          signal: controller.signal,
+        });
         setEmployee(response.data);
+        removeAbortController(controller);
       },
       generateProblemMessage: extractErrorMessage,
     }),
@@ -47,7 +80,13 @@ export const useEmployeeApi = (successCallback?: () => void) => {
 
   const deleteEmployee = useCallback(
     requestHandleDecorator({
-      func: (id: number) => EMPLOYEE_API.employeeDelete(id),
+      func: async (id: number) => {
+        const controller = addAbortController();
+        await EMPLOYEE_API.employeeDelete(id, {
+          signal: controller.signal,
+        });
+        removeAbortController(controller);
+      },
       successMessage: `Employee has been deleted!`,
       generateProblemMessage: extractErrorMessage,
     }),
@@ -57,9 +96,13 @@ export const useEmployeeApi = (successCallback?: () => void) => {
   const updateEmployee = useCallback(
     requestHandleDecorator({
       func: async (id: number, employee: EmployeeDto) => {
-        const response = await EMPLOYEE_API.employeeUpdate(id, employee);
+        const controller = addAbortController();
+        const response = await EMPLOYEE_API.employeeUpdate(id, employee, {
+          signal: controller.signal,
+        });
         setEmployee(response.data);
         successCallback?.();
+        removeAbortController(controller);
       },
       successMessage: 'Employee has been updated!',
       generateProblemMessage: extractErrorMessage,
