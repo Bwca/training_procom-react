@@ -1,1 +1,5 @@
-export type GetterSetterPair<T, STATE extends string, SETTER extends string> = Record<STATE, T> & Record<SETTER, (s: T) => void>;
+export type GetterSetterPair<T, S extends string> = {
+  [K in S]: T;
+} & {
+  [K in `set${Capitalize<S>}`]: (s: T) => void;
+};

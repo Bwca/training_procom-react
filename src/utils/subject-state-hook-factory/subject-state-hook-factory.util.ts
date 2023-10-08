@@ -4,13 +4,10 @@ import { Subject } from 'rxjs';
 
 import { GetterSetterPair } from './models';
 
-export const subjectStateHookFactory = <T, STATE extends string, SETTER extends string>(
-  subject$: Subject<T>,
-  stateName: STATE,
-  setterName: SETTER,
-  initialState?: T,
-) => {
-  return (): GetterSetterPair<T, STATE, SETTER> => {
+export const subjectStateHookFactory = <T, STATE extends string = string>(stateName: STATE, initialState?: T) => {
+  const subject$ = new Subject<T>();
+
+  return (): GetterSetterPair<T, STATE> => {
     const [state, set] = useState<T>(initialState as T);
 
     useEffect(() => {
@@ -24,6 +21,6 @@ export const subjectStateHookFactory = <T, STATE extends string, SETTER extends 
       subject$.next(s);
     }, []);
 
-    return { [stateName]: state, [setterName]: setState } as GetterSetterPair<T, STATE, SETTER>;
+    return { [stateName]: state, [`set${stateName.charAt(0).toUpperCase}${stateName.slice(1)}`]: setState } as GetterSetterPair<T, STATE>;
   };
 };
